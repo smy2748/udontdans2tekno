@@ -7,6 +7,7 @@
  *
  * Students are to complete this class.
  *
+ * Implemented by: Stephen Yingling
  */
 
 import com.jogamp.opengl.util.texture.*;

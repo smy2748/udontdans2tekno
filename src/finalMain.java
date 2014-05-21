@@ -1,9 +1,9 @@
 /**
  *  finalMain.java
  *
- *  Main class for texture assignment.
+ *  Main class for Final
  *
- *  Students should not be modifying this file.
+ *  Implemented by Stephen Yingling
  */
 
 import javax.media.opengl.*;
@@ -25,6 +25,8 @@ public class finalMain implements GLEventListener, KeyListener
     private int ebuffer[];
     private int numVerts[];
 
+
+    //Angles and Lighting
     public float angles[];
     public float lightPos[];
     public int specEx;
@@ -48,7 +50,7 @@ public class finalMain implements GLEventListener, KeyListener
      */
     cgShape myShape;
 
-
+    //Lighting Parameters
     lightingParams myPhong;
 
     /**
@@ -58,6 +60,8 @@ public class finalMain implements GLEventListener, KeyListener
 
     /**
      * constructor
+     *
+     * Rotation and light position added by: Stephen Yingling
      */
     public finalMain(GLCanvas G)
     {
@@ -65,11 +69,13 @@ public class finalMain implements GLEventListener, KeyListener
         ebuffer = new int[1];
         numVerts = new int [1];
 
+        //Initialize a rotation
         angles = new float[3];
         angles[0] = -5.0f;
         angles[1] = -5.0f;
         angles[2] = 0.0f;
 
+        //Initialize light position
         lightPos = new float[4];
         lightPos[0] = -1.5f;
         lightPos[1] = -1f;
@@ -100,16 +106,12 @@ public class finalMain implements GLEventListener, KeyListener
 
 
     /**
-     * Called by the drawable to initiate OpenGL rendering by the client. 
+     * Displays a textured shape using the passed in GL2 instance
+     * @param gl2 The GL2 instance to use
+     *
+     * Adapted by: Stephen Yingling
      */
-    public void display(GLAutoDrawable drawable)
-    {
-
-        // get GL
-        GL2 gl2 = (drawable.getGL()).getGL2();
-        createWoodBlocks(gl2);
-        // clear your frame buffers
-        gl2.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT );
+    public void displayTex(GL2 gl2){
 
         // bind your vertex buffer
         gl2.glBindBuffer ( GL.GL_ARRAY_BUFFER, vbuffer[0]);
@@ -123,11 +125,11 @@ public class finalMain implements GLEventListener, KeyListener
         int  vPosition = gl2.glGetAttribLocation (shaderProgID, "vPosition");
         gl2.glEnableVertexAttribArray ( vPosition );
         gl2.glVertexAttribPointer (vPosition, 4, GL.GL_FLOAT, false,
-                                       0, 0l);
+                0, 0l);
         int  vTex = gl2.glGetAttribLocation (shaderProgID, "vTexCoord");
         gl2.glEnableVertexAttribArray ( vTex );
         gl2.glVertexAttribPointer (vTex, 2, GL.GL_FLOAT, false,
-                                   0, dataSize);
+                0, dataSize);
 
         // setup uniform variables for texture
         tex.setUpTextures (shaderProgID, gl2);
@@ -137,14 +139,16 @@ public class finalMain implements GLEventListener, KeyListener
 
         // draw your shapes
         gl2.glDrawElements ( GL.GL_TRIANGLES, numVerts[0],
-	    GL.GL_UNSIGNED_SHORT, 0l);
+                GL.GL_UNSIGNED_SHORT, 0l);
+    }
 
-
-
-        myPhong.setLightpos(lightPos);
-        myPhong.setSpecularExponent(specEx);
-        createRedBlock(gl2);
-
+    /**
+     * Displays a shaded shape using the passed in GL2 instance
+     * @param gl2 The GL2 instance to use
+     *
+     * Adapted by: Stephen Yingling
+     */
+    public void displayShaded(GL2 gl2){
         gl2.glBindBuffer ( GL.GL_ARRAY_BUFFER, vbuffer[0]);
 
         // bind your element array buffer
@@ -152,8 +156,8 @@ public class finalMain implements GLEventListener, KeyListener
 
         // set up your attribute variables
         gl2.glUseProgram(shaderProgID);
-         dataSize = myShape.getNVerts() * 4l * 4l;
-          vPosition = gl2.glGetAttribLocation (shaderProgID, "vPosition");
+        long dataSize = myShape.getNVerts() * 4l * 4l;
+        int  vPosition = gl2.glGetAttribLocation (shaderProgID, "vPosition");
         gl2.glEnableVertexAttribArray ( vPosition );
         gl2.glVertexAttribPointer (vPosition, 4, GL.GL_FLOAT, false,
                 0, 0l);
@@ -162,89 +166,62 @@ public class finalMain implements GLEventListener, KeyListener
         gl2.glVertexAttribPointer(vNormal, 3, GL.GL_FLOAT, false,
                 0, dataSize);
 
-        float diffuse[] = {1f,0f,0f,1f};
-        myPhong.setDiffuse(diffuse);
+
         myPhong.setUpPhong (shaderProgID, gl2);
 
         // draw your shapes
         gl2.glDrawElements ( GL.GL_TRIANGLES, numVerts[0],
                 GL.GL_UNSIGNED_SHORT, 0l);
+    }
+    /**
+     * Called by the drawable to initiate OpenGL rendering by the client.
+     * Creates the wooden blocks, then the colored (shaded) ones.
+     *
+     * Implemented by Stephen Yingling
+     */
+    public void display(GLAutoDrawable drawable)
+    {
+
+        // get GL
+        GL2 gl2 = (drawable.getGL()).getGL2();
+        // clear your frame buffers
+        gl2.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT );
+
+        //Make wooen blocks
+        createWoodBlocks(gl2);
+        displayTex(gl2);
+
+
+        //Prepare for Shading
+        myPhong.setLightpos(lightPos);
+        myPhong.setSpecularExponent(specEx);
+
+        //Make red block
+        float diffuse[] = {1f,0f,0f,1f};
+        myPhong.setDiffuse(diffuse);
+        createRedBlock(gl2);
+        displayShaded(gl2);
+
 
 
         //blue Block
-
-
-        createBlueBlock(gl2);
-
-        dataSize = myShape.getNVerts() * 4l * 4l;
-        gl2.glEnableVertexAttribArray ( vPosition );
-        gl2.glVertexAttribPointer (vPosition, 4, GL.GL_FLOAT, false,
-                0, 0l);
-        vNormal = gl2.glGetAttribLocation (shaderProgID, "vNormal");
-        gl2.glEnableVertexAttribArray ( vNormal );
-        gl2.glVertexAttribPointer (vNormal, 3, GL.GL_FLOAT, false,
-                0, dataSize);
-
-        theta = gl2.glGetUniformLocation (shaderProgID, "theta");
-        gl2.glUniform3fv (theta, 1, angles, 0);
-
         float[] diffuseBlue = {0f,0f,1f,0f};
         myPhong.setDiffuse(diffuseBlue);
-        myPhong.setUpPhong (shaderProgID, gl2);
-
-
-        // draw your shapes
-        gl2.glDrawElements ( GL.GL_TRIANGLES, numVerts[0],
-                GL.GL_UNSIGNED_SHORT, 0l);
-
+        createBlueBlock(gl2);
+        displayShaded(gl2);
 
         //Green Block
-        createGreenBlock(gl2);
-
-        dataSize = myShape.getNVerts() * 4l * 4l;
-        gl2.glEnableVertexAttribArray ( vPosition );
-        gl2.glVertexAttribPointer (vPosition, 4, GL.GL_FLOAT, false,
-                0, 0l);
-        vNormal = gl2.glGetAttribLocation (shaderProgID, "vNormal");
-        gl2.glEnableVertexAttribArray ( vNormal );
-        gl2.glVertexAttribPointer (vNormal, 3, GL.GL_FLOAT, false,
-                0, dataSize);
-
-        theta = gl2.glGetUniformLocation (shaderProgID, "theta");
-        gl2.glUniform3fv (theta, 1, angles, 0);
-
         float[] diffuseGreen = {0f,1f,0f,0f};
         myPhong.setDiffuse(diffuseGreen);
-        myPhong.setUpPhong (shaderProgID, gl2);
+        createGreenBlock(gl2);
+        displayShaded(gl2);
 
-
-        // draw your shapes
-        gl2.glDrawElements ( GL.GL_TRIANGLES, numVerts[0],
-                GL.GL_UNSIGNED_SHORT, 0l);
-
-        //Green Block
-        createYellowBlock(gl2);
-
-        dataSize = myShape.getNVerts() * 4l * 4l;
-        gl2.glEnableVertexAttribArray ( vPosition );
-        gl2.glVertexAttribPointer (vPosition, 4, GL.GL_FLOAT, false,
-                0, 0l);
-        vNormal = gl2.glGetAttribLocation (shaderProgID, "vNormal");
-        gl2.glEnableVertexAttribArray ( vNormal );
-        gl2.glVertexAttribPointer (vNormal, 3, GL.GL_FLOAT, false,
-                0, dataSize);
-
-        theta = gl2.glGetUniformLocation (shaderProgID, "theta");
-        gl2.glUniform3fv (theta, 1, angles, 0);
-
+        //Yellow Block
         float[] diffuseYellow = {1f,1f,0f,0f};
         myPhong.setDiffuse(diffuseYellow);
-        myPhong.setUpPhong (shaderProgID, gl2);
+        createYellowBlock(gl2);
+        displayShaded(gl2);
 
-
-        // draw your shapes
-        gl2.glDrawElements(GL.GL_TRIANGLES, numVerts[0],
-                GL.GL_UNSIGNED_SHORT, 0l);
     }
 
 
@@ -305,6 +282,12 @@ public class finalMain implements GLEventListener, KeyListener
 
     }
 
+    /**
+     * Creates the red block in the bottom left of the image
+     * @param gl2 The GL2 instance to use
+     *
+     *Implemented by: Stephen Yingling
+     */
     public void createRedBlock(GL2 gl2){
         myShape = new cgShape();
 
@@ -313,6 +296,12 @@ public class finalMain implements GLEventListener, KeyListener
         bpcShade(gl2);
     }
 
+    /**
+     * Creates the blue block
+     * @param gl2 The GL2 instance to use
+     *
+     *Implemented by: Stephen Yingling
+     */
     public void createBlueBlock(GL2 gl2){
         myShape = new cgShape();
 
@@ -321,6 +310,12 @@ public class finalMain implements GLEventListener, KeyListener
         bpcShade(gl2);
     }
 
+    /**
+     * Creates the yellow block
+     * @param gl2 The GL2 instance to use
+     *
+     *Implemented by: Stephen Yingling
+     */
     public void createYellowBlock(GL2 gl2){
         myShape = new cgShape();
 
@@ -329,6 +324,12 @@ public class finalMain implements GLEventListener, KeyListener
         bpcShade(gl2);
     }
 
+    /**
+     * Creates the green block
+     * @param gl2 The GL2 instance to use
+     *
+     *Implemented by: Stephen Yingling
+     */
     public void createGreenBlock(GL2 gl2){
         myShape = new cgShape();
 
@@ -338,7 +339,9 @@ public class finalMain implements GLEventListener, KeyListener
     }
 
     /**
-     * creates a new shape
+     * Creates the wooden blocs
+     *
+     * Implemented by: Stephen Yingling
      */
     public void createWoodBlocks(GL2 gl2)
     {
@@ -355,17 +358,23 @@ public class finalMain implements GLEventListener, KeyListener
         myShape.makeCube(0,-.5f,-.5f,.25f);
         myShape.makeCube(.25f,-.5f,-.5f,.25f);
 
-
-
+        //Next row
         myShape.makeCube(0,-.25f,-.5f,.25f);
         myShape.makeCube(.25f,-.25f,-.5f,.25f);
 
 
-
+        //Next-to-top row
         myShape.makeCube(.25f,0f,-.5f,.25f);
 
         boilerplateCreationCode(gl2);
     }
+
+    /**
+     * Boilerplate code for creating shaded shapes
+     * @param gl2
+     *
+     * Adapted by: Stephen Yingling
+     */
      public void bpcShade(GL2 gl2){
 
         // get your vertices and elements
@@ -375,12 +384,12 @@ public class finalMain implements GLEventListener, KeyListener
 
         // set up the vertex buffer
         int bf[] = new int[1];
-        gl2.glGenBuffers (1, bf, 0);
+        gl2.glGenBuffers(1, bf, 0);
         vbuffer[0] = bf[0];
         long vertBsize = myShape.getNVerts() * 4l * 4l;
         long ndataSize = myShape.getNVerts() * 3l * 4l;
-        gl2.glBindBuffer ( GL.GL_ARRAY_BUFFER, vbuffer[0]);
-        gl2.glBufferData ( GL.GL_ARRAY_BUFFER, vertBsize + ndataSize,
+        gl2.glBindBuffer(GL.GL_ARRAY_BUFFER, vbuffer[0]);
+        gl2.glBufferData(GL.GL_ARRAY_BUFFER, vertBsize + ndataSize,
                 null, GL.GL_STATIC_DRAW);
         gl2.glBufferSubData ( GL.GL_ARRAY_BUFFER, 0, vertBsize, points);
         gl2.glBufferSubData ( GL.GL_ARRAY_BUFFER, vertBsize, ndataSize,
@@ -390,12 +399,18 @@ public class finalMain implements GLEventListener, KeyListener
         ebuffer[0] = bf[0];
         long eBuffSize = myShape.getNVerts() * 2l;
         gl2.glBindBuffer ( GL.GL_ELEMENT_ARRAY_BUFFER, ebuffer[0]);
-        gl2.glBufferData ( GL.GL_ELEMENT_ARRAY_BUFFER, eBuffSize,elements,
+        gl2.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, eBuffSize, elements,
                 GL.GL_STATIC_DRAW);
 
         numVerts[0] = myShape.getNVerts();
     }
 
+    /**
+     * Boilerplate code to create textured objects
+     * @param gl2 The GL2 instance to use
+     *
+     *Adapted by: Stephen Yingling
+     */
     public void boilerplateCreationCode(GL2 gl2){
         // get your vertices and elements
         Buffer points = myShape.getVertices();

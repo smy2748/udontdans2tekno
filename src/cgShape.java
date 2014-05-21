@@ -7,6 +7,7 @@
  * functions in this file using the function "addTriangle()" to do the 
  * tessellation.
  *
+ * Implemented By Stephen Yingling
  */
 
 public class cgShape extends simpleShape
@@ -20,8 +21,7 @@ public class cgShape extends simpleShape
     
      
     /**
-     * makeDefaultShape - creates a "unit" shape of your choice using
-     * your tesselation routines.
+     * makeDefaultShape - creates a block at arbitrary coordinates
      * 
      *
      */
@@ -31,12 +31,13 @@ public class cgShape extends simpleShape
     }
 
     /**
-     * makeCube - Create a unit cube, centered at the origin, with a given number
-     * of subdivisions in each direction on each face.
+     * Make a cube
      *
-     *
-     * Can only use calls to addTriangle()
-     * Implemented by Stephen Yingling
+     * Implemented by: Stephen Yingling
+     * @param lowerFrontX the lower front left x value
+     * @param lowerFrontY The lower front left y value
+     * @param lowerFrontZ The lower front left z value
+     * @param length The length of each side
      */
     public void makeCube (float lowerFrontX, float lowerFrontY, float lowerFrontZ, float length)
     {
@@ -88,6 +89,10 @@ public class cgShape extends simpleShape
      * @param ur - The upper right corner of the quad
      * @param ul - The upper left corner of the quad
      * @param subs - The number of subdivisions for the quad
+     * @param textureLLx - The lower left corner of the texture x val
+     * @param textureLLy - The lower left corner of the texture y val
+     * @param flip - Whether or not to flip the texture
+     * @param sideLen - the length of the side (for scaling porpoises)
      * Implemented by: Stephen Yingling
      */
     public void makeQuad(MyPoint ll, MyPoint lr, MyPoint ur, MyPoint ul, int subs,float textureLLx, float textureLLy, boolean flip,float sideLen ){
@@ -108,13 +113,20 @@ public class cgShape extends simpleShape
     }
 
     /**
-     * Draws a column of quads
+     * Draw a column of quads
+     * * Implemented by Stephen Yingling
      * @param q - The left upper point of the column
      * @param r - The left lower point of the column
      * @param qp - The right upper point of the column
      * @param rp - The right lower point of the column
      * @param numSubs - The number of rows for this column
-     * Implemented by: Stephen Yingling
+     * @param txllx - The bootom left corner of the texture x val
+     * @param txlly - The bottom left corner of the texture y val
+     * @param cx - The lower left corener x val
+     * @param cy - The lower left corener y val
+     * @param cz - The lower left corener z val
+     * @param flip - Whether or not to flip the image
+     * @param sideLen - The length of each side
      */
     public void makeQuadCol(MyPoint q, MyPoint r, MyPoint qp, MyPoint rp, int numSubs,
                             float txllx, float txlly,
@@ -131,10 +143,19 @@ public class cgShape extends simpleShape
                     p4 = qp.mult(1-(f+sublength)).add(rp.mult(f+sublength));
 
             addTriangle(p3,p4,p2,txllx,txlly,cx,cy,cz,flip, sideLen);
-            addTriangle(p3,p2,p1,txllx,txlly,cx,cy,cz,flip, sideLen);
+            addTriangle(p3, p2, p1, txllx, txlly, cx, cy, cz, flip, sideLen);
         }
     }
 
+    /**
+     * Normalizes the value
+     *
+     * Implemented by Stephen Yingling
+     * @param val The value to normalize
+     * @param max The max possible values
+     * @param min The min possible value
+     * @return The normalized value
+     */
     public float normalize(float val, float max, float min){
         return (val-min)/(max-min);
     }
@@ -187,7 +208,7 @@ public class cgShape extends simpleShape
             float xmin = cx, xmax=cx+sideLen,
                   zmin = cz, zmax=cz+sideLen;
             if(!flip){
-                addTriangle(p1.getX(), p1.getY(), p1.getZ(),.25f*normalize(p1.getX(),xmax,xmin)+txllx,.25f*normalize(p1.getZ(),zmax,zmin)+txlly,
+                addTriangle(p1.getX(), p1.getY(), p1.getZ(),.25f*normalize(p1.getX(), xmax, xmin)+txllx,.25f*normalize(p1.getZ(), zmax, zmin)+txlly,
                         p2.getX(), p2.getY(), p2.getZ(), .25f*normalize(p2.getX(),xmax,xmin)+txllx,.25f*normalize(p2.getZ(),zmax,zmin)+txlly,
                         p3.getX(), p3.getY(), p3.getZ(), .25f*normalize(p3.getX(),xmax,xmin)+txllx, .25f*normalize(p3.getZ(),zmax,zmin)+txlly);
             }

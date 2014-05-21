@@ -21,6 +21,8 @@ attribute vec2 vTexCoord;
 
 varying vec2 texCo;
 
+//The vertex shader
+//Implemented by Stephen Yingling
 void main()
 {
      vec3 angles = radians (theta);
@@ -78,11 +80,6 @@ void main()
         vec4 vertexInEye = modelViewMatrix * vPosition;
         vec4 lightInEye = viewMatrix * lightPosition;
 
-        // Cheap and dirty way to transform normals  Remember that
-        // translations should be ignored when transforming normals.  Does
-        // not work with non uniform scaling in the modelView Matrix.  See
-        // http://www.lighthouse3d.com/tutorials/glsl-tutorial/the-normal-matrix/
-        // for more infomration.
         vec4 normalInEye = normalize(modelViewMatrix * vec4(vNormal, 0.0));
 
         // pass our vertex data to the fragment shader

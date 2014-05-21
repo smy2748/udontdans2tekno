@@ -18,11 +18,10 @@ varying vec3 lPos;
 varying vec3 vPos;
 varying vec3 vNorm;
 
+//IMplemented by Stephen Yingling
 void main()
-{ 
-    // replace with proper texture function
+{
     //if tex mapping
-
     if(isTex >.5){
         gl_FragColor = texture2D(tex, texCo);
     }

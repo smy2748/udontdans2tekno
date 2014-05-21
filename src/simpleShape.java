@@ -7,6 +7,7 @@
  * Of note is the protected method addTriangles() which is what students
  * should use to define their tessellations.
  *
+ * Used by: Stephen Yingling
  */
 
 import java.nio.Buffer;
